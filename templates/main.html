@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Video Streaming</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #333;
+        }
+        #resource-usage {
+            display: flex;
+            justify-content: center;
+        }
+        .camera-feed {
+            min-width: 200px; /* Минимальная ширина изображения */
+            max-width: 100%;  /* Максимальная ширина, чтобы изображение не выходило за рамки контейнера */
+            height: auto;     /* Высота подстраивается автоматически */
+        }
+
+		/* Стили для задания одинаковой высоты карточек */
+        .card {
+            min-height: 100%;
+            display: flex;
+            flex-direction: column;
+            background-color: #777;
+        }
+
+		.card-body {
+            flex-grow: 1;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        {% for camera_key, camera_url in cameras.items() %}
+            <div class="col-md-4 col-sm-6 my-3">
+                <div class="card">
+                    <h5 class="card-header">{{ camera_key }}</h5>
+                    <div class="card-body">
+                        <img src="{{ url_for('video_feed', camera_key=camera_key) }}" class="camera-feed img-fluid">
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+<div id="resource-usage">
+    <p>Memory usage: <span id="memory-usage">loading...</span> GB,
+    CPU usage: <span id="cpu-usage">loading...</span>%</p>
+</div>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    function fetchResourceUsage() {
+      fetch('/resources')
+        .then(response => response.json())
+        .then(data => {
+          document.getElementById('memory-usage').textContent = data.memory_use.toFixed(2);
+          document.getElementById('cpu-usage').textContent = data.cpu_use.toFixed(2);
+        })
+        .catch(error => console.error('Error fetching resource usage:', error));
+    }
+
+    // Вызываем функцию сразу после загрузки страницы
+    fetchResourceUsage();
+
+    // Затем повторяем вызов каждую минуту
+    setInterval(fetchResourceUsage, 60000);
+  </script>
+</body>
+</html>
