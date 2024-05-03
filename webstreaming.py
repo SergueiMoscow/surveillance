@@ -7,16 +7,7 @@ import time
 import cv2
 
 app: Flask = Flask(__name__)
-# Road1
-# source: str = 'rtsp://192.168.12.88:554/user=admin&password=17321111&channel=1&stream=1.sdp'
-# Road2
-source: str = "rtsp://admin:17321111@192.168.12.191:554/live/ch0"
-# Balkon north
-# source: str = 'rtsp://admin:admin@192.168.12.36/ch0_0.h264 admin/ss1732'
-# Веранда
-# source: str = 'rtsp://admin:17321111@192.168.12.52:554/live/ch1'
-# Smart:
-# source: str = 'http://admin:17321111@192.168.12.96/cgi-bin/video.cgi?camera=1&mode=1'
+source: str = 'rtsp://admin:admin@192.168.12.36/ch0_0.h264'
 
 
 def get_filename():

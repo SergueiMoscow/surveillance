@@ -15,3 +15,6 @@ with open(cameras_json) as f:
 print(f'Configured {len(cameras)} cameras')
 
 save_path = env('SAVE_PATH')
+ai_model = env('AI_MODEL')
+proto_txt = env('PROTO_TXT')
+min_confidence = env.float('CONFIDENCE')

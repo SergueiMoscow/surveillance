@@ -28,7 +28,7 @@ def video_feed(camera_key) -> Response:
 
 @app.route('/resources')
 def resources():
-    resource_usage = get_resource_usage()
+    resource_usage = get_resource_usage(processes)
     return jsonify(resource_usage)
 
 
@@ -52,8 +52,13 @@ if __name__ == '__main__':
         processes = []
         for camera_key, camera_source in cameras.items():
             # Для каждой камеры создаём отдельный процесс
-            p = Process(target=cache_frames, args=(camera_key, camera_source, last_frame, running))
+            p = Process(
+                target=cache_frames,
+                args=(camera_key, camera_source, last_frame, running),
+                name=f'Process_{camera_key}',
+            )
             p.start()
+            print(f'Started process {p.name}')
             processes.append(p)
 
         try:
