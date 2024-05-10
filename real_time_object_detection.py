@@ -7,7 +7,7 @@ CLASSES = ["background", "aeroplane", "bicycle", "bird", "boat",
            "bottle", "bus", "car", "cat", "chair", "cow", "diningtable",
            "dog", "horse", "motorbike", "person", "pottedplant", "sheep",
            "sofa", "train", "tvmonitor"]
-IGNORE_CLASSES = ['bottle', 'boat', 'train', 'bus']
+IGNORE_CLASSES = ['bottle', 'boat', 'train', 'bus', 'aeroplane']
 COLORS = np.random.uniform(0, 255, size=(len(CLASSES), 3))
 
 print("[INFO] loading model...")
