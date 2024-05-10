@@ -1,0 +1,6 @@
+opencv-python
+flask
+imutils
+environs
+psutil
+asyncio
