@@ -1,6 +1,8 @@
 import datetime
 import os
 import time
+
+import asyncio
 import psutil
 import cv2
 
@@ -16,7 +18,7 @@ def get_filename(camera_key):
     return os.path.join(path, f'm_{current_time}.avi')
 
 
-def cache_frames(camera_key: str, camera_source: str, last_frame: dict, running) -> None:
+async def cache_frames(camera_key: str, camera_source: str, last_frame: dict, running) -> None:
     """ Кэширование кадров """
     print('services.py, cache_frames, source:', camera_source)
     frame_count = 0
@@ -26,7 +28,7 @@ def cache_frames(camera_key: str, camera_source: str, last_frame: dict, running)
         # cap.set(cv2.CAP_PROP_BUFFERSIZE, 1) #в некоторых случаях это позволяет избавится от старых кадров
         if not cap.isOpened():
             print(f"Не удается открыть поток камеры {camera_key}. Попытка переподключения через 60 секунд.")
-            time.sleep(60)
+            await asyncio.sleep(60)
             continue
         else:
             print(f'Камера {camera_key} подключена')
