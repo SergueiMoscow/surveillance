@@ -1,8 +1,6 @@
 import datetime
 import os
 
-import aiofiles
-import asyncio
 import cv2
 from settings import save_path
 
