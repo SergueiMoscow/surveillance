@@ -1,0 +1,12 @@
+version: '3'
+services:
+  surveillance:
+    container_name: surveillance-app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8090:8090"
+    volumes:
+      - ./:/app
+      - /storages/cameras:/files

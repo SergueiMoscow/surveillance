@@ -46,7 +46,7 @@ def generate(camera_key, shared_last_frame: dict):
 
 if __name__ == '__main__':
     with Manager() as manager:
-        last_frame = manager.dict()  # Теперь используем словарь для кэширования последних кадров
+        last_frame = manager.dict()  # Используем словарь для кэширования последних кадров
         running = manager.Value('i', 1)
 
         processes = []

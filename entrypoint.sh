@@ -1,4 +1,2 @@
 #!/bin/bash
-source ./venv/bin/activate
-python main.py
-deactivate
+poetry run python main.py

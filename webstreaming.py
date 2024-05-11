@@ -7,7 +7,8 @@ import time
 import cv2
 
 app: Flask = Flask(__name__)
-source: str = 'rtsp://admin:admin@192.168.12.36/ch0_0.h264'
+# source: str = 'rtsp://admin:admin@192.168.12.36/ch0_0.h264'
+source: str = 'rtsp://admin:17321111@192.168.12.191:554/live/ch1'
 
 
 def get_filename():

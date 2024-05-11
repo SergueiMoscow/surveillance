@@ -6,6 +6,7 @@ import asyncio
 import psutil
 import cv2
 
+from VideoWriter import AsyncVideoWriter
 from real_time_object_detection import object_detection
 from settings import save_path
 
@@ -18,17 +19,17 @@ def get_filename(camera_key):
     return os.path.join(path, f'm_{current_time}.avi')
 
 
-async def cache_frames(camera_key: str, camera_source: str, last_frame: dict, running) -> None:
+def cache_frames(camera_key: str, camera_source: str, last_frame: dict, running) -> None:
     """ Кэширование кадров """
     print('services.py, cache_frames, source:', camera_source)
     frame_count = 0
     cap = cv2.VideoCapture(camera_source)
     filename = ''
     while running.value:
-        # cap.set(cv2.CAP_PROP_BUFFERSIZE, 1) #в некоторых случаях это позволяет избавится от старых кадров
+        cap.set(cv2.CAP_PROP_BUFFERSIZE, 1) #в некоторых случаях это позволяет избавится от старых кадров
         if not cap.isOpened():
             print(f"Не удается открыть поток камеры {camera_key}. Попытка переподключения через 60 секунд.")
-            await asyncio.sleep(60)
+            time.sleep(60)
             continue
         else:
             print(f'Камера {camera_key} подключена')
@@ -79,23 +80,27 @@ async def cache_frames(camera_key: str, camera_source: str, last_frame: dict, ru
                     # detect objects:
                     if object_detected:
                         if video_writer is None:  # Инициализировать записывающее устройство, если его нет
-                            fshape = new_frame.shape
-                            fheight = fshape[0]
-                            fwidth = fshape[1]
-                            fourcc = cv2.VideoWriter_fourcc(*'MJPG')  # Вы можете выбрать кодек, который вам подходит
-                            filename = get_filename(camera_key)
-                            print(f'Пишем файл {filename}')
-                            video_writer = cv2.VideoWriter(filename, fourcc, 20.0, (fwidth, fheight))
+                            # fshape = new_frame.shape
+                            # fheight = fshape[0]
+                            # fwidth = fshape[1]
+                            # fourcc = cv2.VideoWriter_fourcc(*'MJPG')  # Вы можете выбрать кодек, который вам подходит
+                            # filename = get_filename(camera_key)
+                            # print(f'Пишем файл {filename}')
+                            # video_writer = cv2.VideoWriter(filename, fourcc, 20.0, (fwidth, fheight))
+                            video_writer = AsyncVideoWriter(camera_key)
+                            asyncio.run(video_writer.write_frame(new_frame))
 
-                        video_writer.write(new_frame)  # Запись кадра
+                        asyncio.run(video_writer.write_frame(new_frame))  # Запись кадра
                         frames_recorded += 1
 
                 else:  # Если нет движения
                     if video_writer is not None:  # Если записывающее устройство инициализировано
-                        video_writer.release()  # Закрываем поток записи
+                        # video_writer.release()  # Закрываем поток записи
+                        # video_writer = None
+                        # frames_recorded = 0
+                        # print(f'Закрываем файл {filename}')
+                        asyncio.run(video_writer.stop_recording())
                         video_writer = None
-                        frames_recorded = 0
-                        print(f'Закрываем файл {filename}')
                 # Конец записи в файл
                 last_frame[camera_key] = buffer.tobytes()  # Кэширование кадра
             else:
@@ -124,7 +129,7 @@ def get_resource_usage(processes, summary=True):
     total_memory_use = 0
     total_cpu_use = 0
     detail_usage = []
-
+    py = None
     for p in processes:
         if p.is_alive():
             py = psutil.Process(p.pid)
