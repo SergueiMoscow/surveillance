@@ -10,3 +10,4 @@ services:
     volumes:
       - ./:/app
       - /storages/cameras:/files
+      - /var/run/docker.sock:/var/run/docker.sock
