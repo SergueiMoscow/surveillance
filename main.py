@@ -3,6 +3,7 @@ import time
 from flask import Response, Flask, render_template, abort, jsonify
 from multiprocessing import Process, Manager
 
+import settings
 from services import cache_frames, get_resource_usage
 from settings import cameras
 
@@ -62,7 +63,7 @@ if __name__ == '__main__':
             processes.append(p)
 
         try:
-            app.run(host='0.0.0.0', port=8000, debug=False, threaded=True, use_reloader=False)
+            app.run(host='0.0.0.0', port=settings.port, debug=False, threaded=True, use_reloader=False)
         except KeyboardInterrupt:
             pass  # Обработка выхода по Ctrl+C
         finally:
