@@ -3,6 +3,8 @@ import os
 import time
 
 import asyncio
+
+import docker
 import psutil
 import cv2
 
@@ -112,6 +114,10 @@ def cache_frames(camera_key: str, camera_source: str, last_frame: dict, running)
         cap.release()
 
 
+def is_running_in_docker():
+    return os.path.isfile('/.dockerenv')
+
+
 def get_resource_usage_old():
     pid = os.getpid()
     py = psutil.Process(pid)
@@ -154,4 +160,28 @@ def get_resource_usage(processes, summary=True):
     return {
         "total_memory_use": total_memory_use,
         "total_cpu_use": total_cpu_use,
+    }
+
+
+def get_container_resource_usage():
+    container_id = os.getenv('HOSTNAME')  # Получить идентификатор контейнера
+    client = docker.from_env()  # Создать клиента Docker
+    container = client.containers.get(container_id)  # Получить объект контейнера
+    stats_objects = container.stats(stream=False)  # Получить статистику контейнера
+    cpu_stats = stats_objects['cpu_stats']
+    mem_stats = stats_objects['memory_stats']
+    net_stats = stats_objects['networks']
+
+    # После этого вы можете вычислить конкретные статистики, которые вам интересны.
+    # Например, можно вычислить общее использование памяти следующим образом:
+    memory_usage_in_gb = float(mem_stats['usage'] / (1024 ** 3))
+
+    # Использование CPU можно вычислить с помощью дельты использования процессора и дельты общего времени процессора.
+    cpu_delta = float(cpu_stats['cpu_usage']['total_usage'])  # Извлекаем только общее использование CPU.
+    cpu_usage = float(cpu_delta / (1024 ** 3))  # Преобразуем в Гб
+
+    return {
+        "total_memory_use": memory_usage_in_gb,
+        "total_cpu_use": cpu_usage,
+        "net_use": net_stats,
     }

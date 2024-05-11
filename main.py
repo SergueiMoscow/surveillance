@@ -4,7 +4,7 @@ from flask import Response, Flask, render_template, abort, jsonify
 from multiprocessing import Process, Manager
 
 import settings
-from services import cache_frames, get_resource_usage
+from services import cache_frames, get_resource_usage, is_running_in_docker, get_container_resource_usage
 from settings import cameras
 
 
@@ -29,7 +29,10 @@ def video_feed(camera_key) -> Response:
 
 @app.route('/resources')
 def resources():
-    resource_usage = get_resource_usage(processes)
+    if is_running_in_docker():
+        return jsonify(get_container_resource_usage())
+    else:
+        resource_usage = get_resource_usage(processes)
     return jsonify(resource_usage)
 
 
