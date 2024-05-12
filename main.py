@@ -4,6 +4,7 @@ from flask import Response, Flask, render_template, abort, jsonify
 from multiprocessing import Process, Manager
 
 import settings
+from VideoHandler import VideoHandler
 from services import cache_frames, get_resource_usage, is_running_in_docker, get_container_resource_usage
 from settings import cameras
 
@@ -54,11 +55,24 @@ if __name__ == '__main__':
         running = manager.Value('i', 1)
 
         processes = []
+        # for camera_key, camera_source in cameras.items():
+        #     # Для каждой камеры создаём отдельный процесс
+        #     p = Process(
+        #         target=cache_frames,
+        #         args=(camera_key, camera_source, last_frame, running),
+        #         name=f'Process_{camera_key}',
+        #     )
+        #     p.start()
+        #     print(f'Started process {p.name}')
+        #     processes.append(p)
+
         for camera_key, camera_source in cameras.items():
+            # Создаем объект для каждой камеры
+            video_processor = VideoHandler(camera_key, camera_source, last_frame, running)
+
             # Для каждой камеры создаём отдельный процесс
             p = Process(
-                target=cache_frames,
-                args=(camera_key, camera_source, last_frame, running),
+                target=video_processor.run,
                 name=f'Process_{camera_key}',
             )
             p.start()

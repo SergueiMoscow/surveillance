@@ -1,3 +1,5 @@
+from typing import Tuple, Any
+
 import cv2
 import numpy as np
 from settings import proto_txt, ai_model, min_confidence
@@ -7,14 +9,14 @@ CLASSES = ["background", "aeroplane", "bicycle", "bird", "boat",
            "bottle", "bus", "car", "cat", "chair", "cow", "diningtable",
            "dog", "horse", "motorbike", "person", "pottedplant", "sheep",
            "sofa", "train", "tvmonitor"]
-IGNORE_CLASSES = ['bottle', 'boat', 'train', 'bus', 'aeroplane']
+IGNORE_CLASSES = ['bottle', 'boat', 'train', 'bus', 'aeroplane', 'diningtable']
 COLORS = np.random.uniform(0, 255, size=(len(CLASSES), 3))
 
 print("[INFO] loading model...")
 net = cv2.dnn.readNetFromCaffe(proto_txt, ai_model)
 
 
-def object_detection(frame):
+def object_detection(frame) -> Tuple[bool, Any]:
     if frame is None:
         return
     fshape = frame.shape
