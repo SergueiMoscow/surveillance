@@ -154,7 +154,37 @@ def get_resource_usage(processes, summary=True):
     }
 
 
+def calculate_cpu_percent(stats):
+    cpu_count = len(stats['cpu_stats']['cpu_usage']['percpu_usage'])
+    cpu_percent = 0.0
+    cpu_delta = float(stats['cpu_stats']['cpu_usage']['total_usage']) - float(stats['precpu_stats']['cpu_usage']['total_usage'])
+    system_delta = float(stats['cpu_stats']['system_cpu_usage']) - float(stats['precpu_stats']['system_cpu_usage'])
+    if system_delta > 0.0:
+        cpu_percent = cpu_delta / system_delta * cpu_count * 100.0
+    return cpu_percent
+
+
 def get_container_resource_usage():
+    container_id = os.getenv('HOSTNAME')  # Получить идентификатор контейнера
+    client = docker.from_env()  # Создать клиента Docker
+    container = client.containers.get(container_id)  # Получить объект контейнера
+    stats_objects = container.stats(stream=False)  # Получить статистику контейнера
+    cpu_stats = stats_objects['cpu_stats']
+    mem_stats = stats_objects['memory_stats']
+    net_stats = stats_objects['networks']
+
+    memory_usage_in_gb = float(mem_stats['usage'] / (1024 ** 3))  # вычисляем общее использование памяти
+
+    cpu_usage = calculate_cpu_percent(stats_objects)  # вычисляем использование CPU
+
+    return {
+        "total_memory_use": memory_usage_in_gb,
+        "total_cpu_use": cpu_usage,
+        "net_use": net_stats,
+    }
+
+
+def get_container_resource_usage_old():
     container_id = os.getenv('HOSTNAME')  # Получить идентификатор контейнера
     client = docker.from_env()  # Создать клиента Docker
     container = client.containers.get(container_id)  # Получить объект контейнера
