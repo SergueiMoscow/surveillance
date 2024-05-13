@@ -44,7 +44,8 @@ class VideoHandler:
         self.capture.set(cv2.CAP_PROP_BUFFERSIZE, 1)  # избавляемся от старых кадров
         ret, frame = self.capture.read()  # Чтение кадра
         if np.array_equal(frame, self.previous_color_frame):
-            print(f'Equal: {self.counter_equal_frames}')
+            if self.counter_equal_frames > 20:
+                print(f'Equal: {self.counter_equal_frames}')
             self.counter_equal_frames += 1
         else:
             self.counter_equal_frames = 0

@@ -44,6 +44,20 @@
                 </div>
             </div>
         {% endfor %}
+
+        {% for server_info in additional %}
+            {% for camera_key in server_info.cameras %}
+                <div class="col-md-4 col-sm-6 my-3">
+                    <div class="card">
+                        <h5 class="card-header">{{ server_info.name }}: {{ camera_key }}</h5>
+                        <div class="card-body">
+                            <img src="{{ server_info.server }}video_feed/{{ camera_key }}" class="camera-feed img-fluid">
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% endfor %}        
+
     </div>
 </div>
 <div id="resource-usage">
@@ -54,6 +68,10 @@
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script>
+
+    const additionalServers = {{ additional | tojson | safe }};
+
+    
     function fetchResourceUsage() {
       fetch('/resources')
         .then(response => response.json())
@@ -62,6 +80,28 @@
           document.getElementById('cpu-usage').textContent = data.total_cpu_use.toFixed(2);
         })
         .catch(error => console.error('Error fetching resource usage:', error));
+  
+        // Получаем данные для каждого дополнительного сервера
+        additionalServers.forEach(server => {
+            fetch(server.server + 'resources', { mode: 'no-cors' })
+            .then(response => response.json())
+            .then(data => {
+                // Создаем новые элементы HTML для каждого сервера
+                let serverDiv = document.createElement('div');
+                let memorySpan = document.createElement('span');
+                let cpuSpan = document.createElement('span');
+                serverDiv.innerHTML = 'Memory usage for ' + server.name + ': ' + 
+                                    '<span id="' + server.name + '-memory-usage">' + 
+                                    data.total_memory_use.toFixed(2) + ' GB, CPU usage: ' + 
+                                    '<span id="' + server.name + '-cpu-usage">' + 
+                                    data.total_cpu_use.toFixed(2) +'%</p>';
+                
+                // Добавляем новые элементы на страницу 
+                document.getElementById('resource-usage').appendChild(serverDiv);
+            })
+            .catch(error => console.error('Error fetching resource usage for ' + server.name + ':', error));
+        });
+        
     }
 
     // Вызываем функцию сразу после загрузки страницы

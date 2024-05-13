@@ -1,4 +1,5 @@
 import json
+import os
 from pathlib import Path
 
 from environs import Env
@@ -9,10 +10,19 @@ env = Env()
 env.read_env(str(BASE_DIR / '.env'))
 cameras_json = env('CAMERAS')
 print(f'JSON: {cameras_json}')
+additional_json = env('ADDITIONAL_CAMERAS', "")
+print(f'ADDITIONAL: {additional_json}')
 
+# Камеры, подключенные к этой машине:
 with open(cameras_json) as f:
     cameras = json.load(f)
 print(f'Configured {len(cameras)} cameras')
+
+if additional_json != "" and os.path.exists(additional_json):
+    with open(additional_json) as f:
+        additional_cameras = json.load(f)
+else:
+    additional_cameras = []
 
 save_path = env('SAVE_PATH')
 ai_model = env('AI_MODEL')

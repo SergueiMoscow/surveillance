@@ -2,6 +2,7 @@ version: '3'
 services:
   surveillance:
     container_name: surveillance-app
+    restart: always
     build:
       context: .
       dockerfile: Dockerfile

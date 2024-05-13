@@ -2,19 +2,25 @@ import time
 
 from flask import Response, Flask, render_template, abort, jsonify
 from multiprocessing import Process, Manager
+from flask_cors import CORS
 
 import settings
 from VideoHandler import VideoHandler
 from services import cache_frames, get_resource_usage, is_running_in_docker, get_container_resource_usage
-from settings import cameras
+from settings import cameras, additional_cameras
 
 
 app: Flask = Flask(__name__)
+CORS(app)
 
 
 @app.route('/')
 def index():
-    return render_template('main.html', cameras=cameras)
+    return render_template(
+        'main.html',
+        cameras=cameras,
+        additional=additional_cameras
+    )
 
 
 @app.route("/video_feed/<camera_key>")
@@ -55,6 +61,7 @@ if __name__ == '__main__':
         running = manager.Value('i', 1)
 
         processes = []
+        # Old version before refactor (12.05.2024)
         # for camera_key, camera_source in cameras.items():
         #     # Для каждой камеры создаём отдельный процесс
         #     p = Process(
