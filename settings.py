@@ -25,7 +25,7 @@ else:
     additional_cameras = []
 
 save_path = env('SAVE_PATH')
-max_archive_size_gb = env.int('MAX_ARCHIVE_SIZE_GB')
+max_archive_size_gb = env.int('MAX_ARCHIVE_SIZE_GB', 10)
 ai_model = env('AI_MODEL')
 proto_txt = env('PROTO_TXT')
 min_confidence = env.float('CONFIDENCE')

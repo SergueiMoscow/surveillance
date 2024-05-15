@@ -8,7 +8,7 @@ from flask_cors import CORS
 import settings
 from ArchiveHandler import ArchiveHandler
 from VideoHandler import VideoHandler
-from services import cache_frames, get_resource_usage, is_running_in_docker, get_container_resource_usage
+from services import get_resource_usage, is_running_in_docker, get_container_resource_usage
 from settings import cameras, additional_cameras
 
 

@@ -22,7 +22,7 @@ def get_filename(camera_key):
     return os.path.join(path, f'm_{current_time}.avi')
 
 
-def cache_frames(camera_key: str, camera_source: str, last_frame: dict, running) -> None:
+def cache_frames_old(camera_key: str, camera_source: str, last_frame: dict, running) -> None:
     """ Кэширование кадров """
     print('services.py, cache_frames, source:', camera_source)
     frame_count = 0
@@ -110,19 +110,6 @@ def is_running_in_docker():
     return os.path.isfile('/.dockerenv')
 
 
-def get_resource_usage_old():
-    pid = os.getpid()
-    py = psutil.Process(pid)
-
-    memory_use = py.memory_info()[0] / 2. ** 30  # память в Гб
-    cpu_use = py.cpu_percent(interval=1)  # процент использования процессора
-    print(f'Memory: {memory_use}, cpu: {cpu_use}')
-    return {
-        "memory_use": memory_use,
-        "cpu_use": cpu_use,
-    }
-
-
 def get_resource_usage(processes, summary=True):
     total_memory_use = 0
     total_cpu_use = 0
@@ -173,31 +160,6 @@ def get_container_resource_usage():
     net_stats = stats_objects['networks']
     memory_usage_in_gb = float(mem_stats['usage'] / (1024 ** 3))
     cpu_usage = calculate_cpu_percent(stats_objects)
-    return {
-        "total_memory_use": memory_usage_in_gb,
-        "total_cpu_use": cpu_usage,
-        "net_use": net_stats,
-    }
-
-
-
-def get_container_resource_usage_old():
-    container_id = os.getenv('HOSTNAME')  # Получить идентификатор контейнера
-    client = docker.from_env()  # Создать клиента Docker
-    container = client.containers.get(container_id)  # Получить объект контейнера
-    stats_objects = container.stats(stream=False)  # Получить статистику контейнера
-    cpu_stats = stats_objects['cpu_stats']
-    mem_stats = stats_objects['memory_stats']
-    net_stats = stats_objects['networks']
-
-    # После этого вы можете вычислить конкретные статистики, которые вам интересны.
-    # Например, можно вычислить общее использование памяти следующим образом:
-    memory_usage_in_gb = float(mem_stats['usage'] / (1024 ** 3))
-
-    # Использование CPU можно вычислить с помощью дельты использования процессора и дельты общего времени процессора.
-    cpu_delta = float(cpu_stats['cpu_usage']['total_usage'])  # Извлекаем только общее использование CPU.
-    cpu_usage = float(cpu_delta / (1024 ** 3))  # Преобразуем в Гб
-
     return {
         "total_memory_use": memory_usage_in_gb,
         "total_cpu_use": cpu_usage,
