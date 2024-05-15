@@ -7,6 +7,7 @@ from flask_cors import CORS
 
 import settings
 from ArchiveHandler import ArchiveHandler
+from HTTPVideoHandler import HTTPVideoHandler
 from VideoHandler import VideoHandler
 from services import get_resource_usage, is_running_in_docker, get_container_resource_usage
 from settings import cameras, additional_cameras
@@ -64,8 +65,9 @@ if __name__ == '__main__':
         # Запуск процесса проверки размера архива
         archive_handler = ArchiveHandler(settings.save_path, settings.max_archive_size_gb)
         archive_process = Process(
-            target=asyncio.run,
-            args=(archive_handler.check_archive(),),
+            # target=asyncio.run,
+            # args=(archive_handler.check_archive(),),
+            target=archive_handler.check_archive,
             name='Archive_Manager_Process'
         )
         archive_process.start()
@@ -86,7 +88,16 @@ if __name__ == '__main__':
 
         for camera_key, camera_source in cameras.items():
             # Создаем объект для каждой камеры
-            video_processor = VideoHandler(camera_key, camera_source, last_frame, running)
+            if camera_source.startswith('rtsp'):
+                video_processor = VideoHandler(camera_key, camera_source, last_frame, running)
+            elif camera_source.startswith('http'):
+                video_processor = HTTPVideoHandler(
+                    camera_key,
+                    camera_source,
+                    last_frame,
+                    running,
+                    interval = settings.http_request_interval
+                )
 
             # Для каждой камеры создаём отдельный процесс
             p = Process(

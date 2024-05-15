@@ -1,5 +1,6 @@
 import os
 import asyncio
+import time
 
 
 class ArchiveHandler:
@@ -22,7 +23,7 @@ class ArchiveHandler:
             oldest_file = min(files, key=lambda x: x[1])[0]
             os.remove(os.path.join(self.path, oldest_file))
 
-    async def check_archive(self):
+    def check_archive(self):
         while True:
             size = self.calculate_folder_size()
             print(f"Current folder size: {size} GB")
@@ -30,9 +31,4 @@ class ArchiveHandler:
                 print("The folder size is too large. Deleting the oldest files...")
                 self.delete_oldest_files()
                 size = self.calculate_folder_size()
-            await asyncio.sleep(60)
-
-
-if __name__ == "__main__":
-    archive_handler = ArchiveHandler('/path/to/folder', 1)
-    asyncio.run(archive_handler.check_archive())
+            time.sleep(60)

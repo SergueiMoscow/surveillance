@@ -105,8 +105,6 @@ class VideoHandler:
         self._create_capture()
         self._setup_frame()
 
-        #  old code:
-        """ Кэширование кадров """
         print('services.py, cache_frames, source:', self.camera_source)
         # while self.running.value:
 
