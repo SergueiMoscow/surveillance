@@ -1,14 +1,13 @@
 import time
 
-import asyncio
-from flask import Response, Flask, render_template, abort, jsonify
+from flask import Response, Flask, render_template, jsonify
 from multiprocessing import Process, Manager
 from flask_cors import CORS
 
 import settings
-from ArchiveHandler import ArchiveHandler
-from HTTPVideoHandler import HTTPVideoHandler
-from VideoHandler import VideoHandler
+from src.handlers.archive_handler import ArchiveHandler
+from src.handlers.http_video_handler import HTTPVideoHandler
+from src.handlers.video_handler import VideoHandler
 from services import get_resource_usage, is_running_in_docker, get_container_resource_usage
 from settings import cameras, additional_cameras
 

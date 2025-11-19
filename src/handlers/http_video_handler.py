@@ -3,8 +3,9 @@ import time
 import cv2
 import numpy as np
 import requests
-from VideoHandler import VideoHandler
-from real_time_object_detection import object_detection
+
+from src.handlers.video_handler import VideoHandler
+from src.real_time_object_detection import object_detection
 
 
 class HTTPVideoHandler(VideoHandler):

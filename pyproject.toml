@@ -2,7 +2,7 @@
 name = "camera01"
 version = "0.1.0"
 description = ""
-authors = ["Сергей Сушков <sushkov_sv@ursip.ru>"]
+authors = ["Сергей Сушков <s_serguei@rambler.ru>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]

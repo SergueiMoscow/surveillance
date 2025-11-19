@@ -4,7 +4,7 @@ from pathlib import Path
 
 from environs import Env
 
-BASE_DIR = Path(__file__).resolve().parent
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 env = Env()
 env.read_env(str(BASE_DIR / '.env'))
@@ -14,7 +14,7 @@ additional_json = env('ADDITIONAL_CAMERAS', "")
 print(f'ADDITIONAL: {additional_json}')
 
 # Камеры, подключенные к этой машине:
-with open(cameras_json) as f:
+with open(str(BASE_DIR / cameras_json)) as f:
     cameras = json.load(f)
 print(f'Configured {len(cameras)} cameras')
 
@@ -26,8 +26,8 @@ else:
 
 save_path = env('SAVE_PATH')
 max_archive_size_gb = env.int('MAX_ARCHIVE_SIZE_GB', 10)
-ai_model = env('AI_MODEL')
-proto_txt = env('PROTO_TXT')
+ai_model = str(BASE_DIR / env('AI_MODEL'))
+proto_txt = str(BASE_DIR / env('PROTO_TXT'))
 min_confidence = env.float('CONFIDENCE')
 port = env.int('PORT', 8000)
 
