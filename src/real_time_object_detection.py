@@ -2,7 +2,7 @@ from typing import Tuple, Any
 
 import cv2
 import numpy as np
-from src.settings import proto_txt, ai_model, min_confidence
+from settings import proto_txt, ai_model, min_confidence
 
 
 CLASSES = ["background", "aeroplane", "bicycle", "bird", "boat",

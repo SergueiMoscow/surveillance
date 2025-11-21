@@ -5,9 +5,9 @@ from multiprocessing import Process, Manager
 from flask_cors import CORS
 
 import settings
-from src.handlers.archive_handler import ArchiveHandler
-from src.handlers.http_video_handler import HTTPVideoHandler
-from src.handlers.video_handler import VideoHandler
+from handlers.archive_handler import ArchiveHandler
+from handlers.http_video_handler import HTTPVideoHandler
+from handlers.video_handler import VideoHandler
 from services import get_resource_usage, is_running_in_docker, get_container_resource_usage
 from settings import cameras, additional_cameras
 

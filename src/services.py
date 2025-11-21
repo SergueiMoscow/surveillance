@@ -8,10 +8,10 @@ import docker
 import psutil
 import cv2
 
-from src import settings
-from src.video_writer import AsyncVideoWriter
-from src.real_time_object_detection import object_detection
-from src.settings import save_path
+import settings
+from video_writer import AsyncVideoWriter
+from real_time_object_detection import object_detection
+from settings import save_path
 
 
 def get_filename(camera_key):

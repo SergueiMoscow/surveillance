@@ -2,7 +2,7 @@ import datetime
 import os
 
 import cv2
-from src.settings import save_path
+from settings import save_path
 
 
 class AsyncVideoWriter:

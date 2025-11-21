@@ -4,9 +4,9 @@ import time
 
 import numpy as np
 
-from src import settings
-from src.video_writer import AsyncVideoWriter
-from src.real_time_object_detection import object_detection
+import settings
+from video_writer import AsyncVideoWriter
+from real_time_object_detection import object_detection
 
 
 class VideoHandler:

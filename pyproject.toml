@@ -3,7 +3,8 @@ name = "camera01"
 version = "0.1.0"
 description = ""
 authors = ["Сергей Сушков <s_serguei@rambler.ru>"]
-readme = "README.md"
+package-mode = false
+#readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.12"
