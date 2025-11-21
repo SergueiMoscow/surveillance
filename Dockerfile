@@ -1,7 +1,8 @@
-FROM python:3.12
+FROM python:3.14
 RUN apt-get update && apt-get install -y libgl1 #-mesa-glx bash
 WORKDIR /app
 ENV PYTHONPATH=/app
+RUN pip install --upgrade pip setuptools packaging
 COPY pyproject.toml poetry.lock /app/
 RUN pip install poetry && \
     poetry config virtualenvs.create false && \
