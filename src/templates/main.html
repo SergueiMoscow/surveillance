@@ -6,36 +6,115 @@
     <style>
         body {
             background-color: #333;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
         }
+
+        .container-fluid {
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        .camera-grid {
+            display: grid;
+            gap: 8px;
+            padding: 8px;
+            width: 100%;
+            flex: 1;
+            overflow: auto;
+            align-content: start;
+        }
+
+        /* Динамические классы для разного количества камер */
+        .grid-1 { grid-template-columns: 1fr; }
+        .grid-2 { grid-template-columns: repeat(2, 1fr); }
+        .grid-3 { grid-template-columns: repeat(2, 1fr); }
+        .grid-4 { grid-template-columns: repeat(2, 1fr); }
+        .grid-5 { grid-template-columns: repeat(3, 1fr); }
+        .grid-6 { grid-template-columns: repeat(3, 1fr); }
+        .grid-7 { grid-template-columns: repeat(4, 1fr); }
+        .grid-8 { grid-template-columns: repeat(4, 1fr); }
+        .grid-9 { grid-template-columns: repeat(3, 1fr); }
+        .grid-10 { grid-template-columns: repeat(4, 1fr); }
+        .grid-11 { grid-template-columns: repeat(4, 1fr); }
+        .grid-12 { grid-template-columns: repeat(4, 1fr); }
+        .grid-many { grid-template-columns: repeat(4, 1fr); }
+
+        .stats-container {
+            background-color: #222;
+            padding: 8px 0;
+            flex-shrink: 0;
+        }
+
         .resource-usage {
             display: flex;
             justify-content: center;
-        }
-        .camera-feed {
-<!--            min-width: 200px; /* Минимальная ширина изображения */-->
-            max-width: 100%;  /* Максимальная ширина, чтобы изображение не выходило за рамки контейнера */
-            height: auto;     /* Высота подстраивается автоматически */
+            padding: 4px;
+            margin: 0;
+            color: #fff;
+            font-size: 13px;
         }
 
-		/* Стили для задания одинаковой высоты карточек */
+        .resource-usage p {
+            margin: 0;
+        }
+
+        .camera-feed {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background-color: #000;
+        }
+
         .card {
-            min-height: 100%;
+            height: 100%;
             display: flex;
             flex-direction: column;
-            background-color: #777;
+            background-color: #555;
+            border: none;
+            border-radius: 4px;
+            overflow: hidden;
+            min-height: 200px;
         }
 
-		.card-body {
+        .card-header {
+            background-color: #444;
+            color: #fff;
+            padding: 8px 12px;
+            font-size: 14px;
+            border-bottom: 1px solid #666;
+        }
+
+        .card-body {
             flex-grow: 1;
-            padding: 0.5rem;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #000;
+            min-height: 0;
+        }
+
+        /* Медиа-запросы для адаптивности */
+        @media (max-width: 768px) {
+            .camera-grid {
+                grid-template-columns: 1fr !important;
+            }
+        }
+
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .grid-many { grid-template-columns: repeat(3, 1fr); }
         }
     </style>
 </head>
 <body>
-<div class="container">
-    <div class="row">
+<div class="container-fluid">
+    <div class="camera-grid" id="cameraGrid">
         {% for camera_key, camera_url in cameras.items() %}
-            <div class="col-md-4 col-sm-6 my-3">
+            <div class="camera-item">
                 <div class="card">
                     <h5 class="card-header">{{ camera_key }}</h5>
                     <div class="card-body">
@@ -47,7 +126,7 @@
 
         {% for server_info in additional %}
             {% for camera_key in server_info.cameras %}
-                <div class="col-md-4 col-sm-6 my-3">
+                <div class="camera-item">
                     <div class="card">
                         <h5 class="card-header">{{ server_info.name }}: {{ camera_key }}</h5>
                         <div class="card-body">
@@ -56,28 +135,76 @@
                     </div>
                 </div>
             {% endfor %}
-        {% endfor %}        
+        {% endfor %}
+    </div>
 
+    <div class="stats-container">
+        <div class="resource-usage" id="resource-usage">
+            <p>Memory usage: <span id="memory-usage">loading...</span> GB,
+            CPU usage: <span id="cpu-usage">loading...</span>%</p>
+        </div>
+
+        {% for server in additional %}
+            <div class="resource-usage" id="{{server.name}}-usage">
+                <p>Memory usage for {{server.name}}: <span id="{{server.name}}-memory-usage">loading...</span> GB,
+                CPU usage: <span id="{{server.name}}-cpu-usage">loading...</span>%</p>
+            </div>
+        {% endfor %}
     </div>
 </div>
-<div class="resource-usage" id="resource-usage">
-    <p>Memory usage: <span id="memory-usage">loading...</span> GB,
-    CPU usage: <span id="cpu-usage">loading...</span>%</p>
-</div>
-{% for server in additional %}
-    <div class="resource-usage" id="{{server.name}}-usage">
-        <p>Memory usage for {{server.name}}: <span id="{{server.name}}-memory-usage">loading...</span> GB,
-        CPU usage: <span id="{{server.name}}-cpu-usage">loading...</span>%</p>
-    </div>
-{% endfor %}
+
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script>
-
     const additionalServers = {{ additional | tojson | safe }};
 
-    
+    // Динамическое определение количества колонок
+    function updateGridLayout() {
+        const grid = document.getElementById('cameraGrid');
+        const cameraCount = grid.querySelectorAll('.camera-item').length;
+
+        // Удаляем все предыдущие классы grid
+        grid.className = 'camera-grid';
+
+        // Добавляем класс в зависимости от количества камер
+        if (cameraCount <= 12) {
+            grid.classList.add('grid-' + cameraCount);
+        } else {
+            grid.classList.add('grid-many');
+        }
+
+        // Рассчитываем оптимальную высоту для камер
+        adjustCameraHeight();
+    }
+
+    function adjustCameraHeight() {
+        const grid = document.getElementById('cameraGrid');
+        const cameraCount = grid.querySelectorAll('.camera-item').length;
+
+        // Определяем количество рядов
+        let rows = 1;
+        if (cameraCount <= 1) rows = 1;
+        else if (cameraCount <= 4) rows = 2;
+        else if (cameraCount <= 6) rows = 2;
+        else if (cameraCount <= 8) rows = 2;
+        else if (cameraCount <= 12) rows = 3;
+        else rows = Math.ceil(cameraCount / 4);
+
+        // Доступная высота для сетки (вычитаем высоту статистики)
+        const statsHeight = document.querySelector('.stats-container').offsetHeight;
+        const availableHeight = window.innerHeight - statsHeight - 16; // 16px для отступов
+
+        // Высота одного ряда
+        const rowHeight = (availableHeight / rows) - 8; // 8px для gap
+
+        // Применяем высоту к камерам
+        const cameraItems = grid.querySelectorAll('.camera-item');
+        cameraItems.forEach(item => {
+            item.style.height = rowHeight + 'px';
+        });
+    }
+
     function fetchResourceUsage() {
         fetch('/resources')
             .then(response => response.json())
@@ -86,11 +213,10 @@
                 document.getElementById('cpu-usage').textContent = data.total_cpu_use.toFixed(2);
             })
             .catch(error => console.error('Error fetching resource usage:', error));
-      
-        // Получаем данные для каждого дополнительного сервера
+
         additionalServers.forEach(server => {
             fetch(server.server + 'resources')
-            .then(response => { 
+            .then(response => {
                 if (!response.ok) {
                     throw new Error('Network response was not ok ' + response.statusText);
                 }
@@ -99,19 +225,27 @@
                 })
             })
             .then(data => {
-                // Обновляем текст внутри существующих элементов
                 document.getElementById(server.name + '-memory-usage').textContent = data.total_memory_use.toFixed(2);
                 document.getElementById(server.name + '-cpu-usage').textContent = data.total_cpu_use.toFixed(2);
             })
             .catch(error => console.error('Error fetching resource usage for ' + server.name + ':', error));
         });
     }
-    
+
+    // Применяем layout при загрузке
+    updateGridLayout();
+
     // Вызываем функцию сразу после загрузки страницы
     fetchResourceUsage();
 
     // Затем повторяем вызов каждую минуту
     setInterval(fetchResourceUsage, 60000);
-  </script>
+
+    // Обновляем layout при изменении размера окна
+    window.addEventListener('resize', updateGridLayout);
+
+    // Пересчитываем высоту после загрузки всех изображений
+    window.addEventListener('load', adjustCameraHeight);
+</script>
 </body>
 </html>
